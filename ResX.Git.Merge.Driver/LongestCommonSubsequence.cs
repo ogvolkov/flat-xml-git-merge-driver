@@ -5,28 +5,28 @@ namespace ResX.Git.Merge.Driver
 {
     public class LongestCommonSubsequence<T>
     {
-        private readonly int[,] _partialLengths;
+        private readonly int[,] _c;
 
-        public LongestCommonSubsequence(T[] first, T[] second)
+        public LongestCommonSubsequence(T[] x, T[] y)
         {
-            _partialLengths = new int[first.Length + 1, second.Length + 1];
+            _c = new int[x.Length + 1, y.Length + 1];
 
-            for (int i = 1; i <= first.Length; i++)
+            for (int i = 1; i <= x.Length; i++)
             {
-                for (int j = 1; j <= second.Length; j++)
+                for (int j = 1; j <= y.Length; j++)
                 {
-                    if (first[i - 1].Equals(second[j - 1]))
+                    if (x[i - 1].Equals(y[j - 1]))
                     {
-                        _partialLengths[i, j] = _partialLengths[i - 1, j - 1] + 1;
+                        _c[i, j] = _c[i - 1, j - 1] + 1;
                     }
                     else
                     {
-                        _partialLengths[i, j] = Math.Max(_partialLengths[i, j-1], _partialLengths[i - 1, j]);
+                        _c[i, j] = Math.Max(_c[i, j-1], _c[i - 1, j]);
                     }
                 }
             }
         }
 
-        public int this[int i, int j] => _partialLengths[i, j];
+        public int this[int i, int j] => _c[i, j];
     }
 }
