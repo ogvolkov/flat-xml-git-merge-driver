@@ -1,12 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ResX.Git.Merge.Driver
 {
     public static class ThreeWayMerge
     {
-        public static T[] Merge<T>(T[] @base, T[] ours, T[] theirs) where T : IEquatable<T>
+        public static T[] Merge<T>(T[] @base, T[] ours, T[] theirs)
+            where T : IEquatable<T>
         {
             var result = new List<T>();
 
@@ -38,15 +40,15 @@ namespace ResX.Git.Merge.Driver
             {
                 if (basePosition.HasEqualExcessTo(oursPosition))
                 {
-                    theirsPosition.CopyExcessTo(result);
+                    result.AddRange(theirsPosition.Excess);
                 }
                 else if (basePosition.HasEqualExcessTo(theirsPosition))
                 {
-                    oursPosition.CopyExcessTo(result);
+                    result.AddRange(oursPosition.Excess);
                 }
                 else if (oursPosition.HasEqualExcessTo(theirsPosition))
                 {
-                    oursPosition.CopyExcessTo(result);
+                    result.AddRange(oursPosition.Excess);
                 }
                 else
                 {
@@ -65,7 +67,7 @@ namespace ResX.Git.Merge.Driver
 
             private int _currentPosition;
 
-            private int ExcessSize => _currentPosition - _lastPosition - 1;
+            public IEnumerable<T> Excess => new ArraySegment<T>(_a, _lastPosition + 1, _currentPosition - _lastPosition - 1);
 
             public Position(T[] a)
             {
@@ -77,12 +79,7 @@ namespace ResX.Git.Merge.Driver
             public void FindNext(T element)
             {
                 _lastPosition = _currentPosition;
-                ++_currentPosition;
-
-                while (_currentPosition < _a.Length && !_a[_currentPosition].Equals(element))
-                {
-                    ++_currentPosition;
-                }
+                _currentPosition = Array.IndexOf(_a, element, _currentPosition + 1);
             }
 
             public void MoveToEnd()
@@ -91,30 +88,9 @@ namespace ResX.Git.Merge.Driver
                 _currentPosition = _a.Length;
             }
 
-            public void CopyExcessTo(ICollection<T> destination)
+            public bool HasEqualExcessTo(Position<T> other)
             {
-                for (int i = _lastPosition + 1; i < _currentPosition; i++)
-                {
-                    destination.Add(_a[i]);
-                }
-            }
-
-            public bool HasEqualExcessTo(Position<T> another)
-            {
-                if (ExcessSize != another.ExcessSize)
-                {
-                    return false;
-                }
-
-                for (int i = 1; i < _currentPosition - _lastPosition; i++)
-                {
-                    if (!_a[_lastPosition + i].Equals(another._a[another._lastPosition + i]))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
+                return Excess.SequenceEqual(other.Excess);
             }
         }
     }
