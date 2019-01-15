@@ -6,47 +6,47 @@ namespace ResX.Git.Merge.Driver
 {
     public class ThreeWayMerge
     {
-        public T[] Merge<T>(T[] a, T[] x, T[] y) where T : IEquatable<T>
+        public T[] Merge<T>(T[] @base, T[] ours, T[] theirs) where T : IEquatable<T>
         {
             var result = new List<T>();
 
-            var lcsAx = new LongestCommonSubsequence<T>(a, x).Result;
-            var lcs = new LongestCommonSubsequence<T>(lcsAx, y).Result;
+            var lcsBaseOurs = new LongestCommonSubsequence<T>(@base, ours).Result;
+            var lcsAllThree = new LongestCommonSubsequence<T>(lcsBaseOurs, theirs).Result;
 
-            var aPos = new ArrayWithPosition<T>(a);
-            var xPos = new ArrayWithPosition<T>(x);
-            var yPos = new ArrayWithPosition<T>(y);
+            var basePosition = new Position<T>(@base);
+            var oursPosition = new Position<T>(ours);
+            var theirsPosition = new Position<T>(theirs);
 
-            foreach (T element in lcs)
+            foreach (T element in lcsAllThree)
             {
-                aPos.FindNext(element);
-                xPos.FindNext(element);
-                yPos.FindNext(element);
+                basePosition.FindNext(element);
+                oursPosition.FindNext(element);
+                theirsPosition.FindNext(element);
 
                 Advance();
 
                 result.Add(element);
             }
 
-            aPos.MoveToEnd();
-            xPos.MoveToEnd();
-            yPos.MoveToEnd();
+            basePosition.MoveToEnd();
+            oursPosition.MoveToEnd();
+            theirsPosition.MoveToEnd();
 
             Advance();
 
             void Advance()
             {
-                if (aPos.HasEqualExcessTo(xPos))
+                if (basePosition.HasEqualExcessTo(oursPosition))
                 {
-                    yPos.CopyExcessTo(result);
+                    theirsPosition.CopyExcessTo(result);
                 }
-                else if (aPos.HasEqualExcessTo(yPos))
+                else if (basePosition.HasEqualExcessTo(theirsPosition))
                 {
-                    xPos.CopyExcessTo(result);
+                    oursPosition.CopyExcessTo(result);
                 }
-                else if (xPos.HasEqualExcessTo(yPos))
+                else if (oursPosition.HasEqualExcessTo(theirsPosition))
                 {
-                    xPos.CopyExcessTo(result);
+                    oursPosition.CopyExcessTo(result);
                 }
                 else
                 {
@@ -57,7 +57,7 @@ namespace ResX.Git.Merge.Driver
             return result.ToArray();
         }
 
-        private class ArrayWithPosition<T> where T : IEquatable<T>
+        private class Position<T> where T : IEquatable<T>
         {
             private readonly T[] _a;
 
@@ -67,7 +67,7 @@ namespace ResX.Git.Merge.Driver
 
             private int ExcessSize => _currentPosition - _lastPosition - 1;
 
-            public ArrayWithPosition(T[] a)
+            public Position(T[] a)
             {
                 _a = a;
                 _lastPosition = 0;
@@ -99,7 +99,7 @@ namespace ResX.Git.Merge.Driver
                 }
             }
 
-            public bool HasEqualExcessTo(ArrayWithPosition<T> another)
+            public bool HasEqualExcessTo(Position<T> another)
             {
                 if (ExcessSize != another.ExcessSize)
                 {
