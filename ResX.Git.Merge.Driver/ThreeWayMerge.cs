@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace ResX.Git.Merge.Driver
 {
-    public class ThreeWayMerge
+    public static class ThreeWayMerge
     {
-        public T[] Merge<T>(T[] @base, T[] ours, T[] theirs) where T : IEquatable<T>
+        public static T[] Merge<T>(T[] @base, T[] ours, T[] theirs) where T : IEquatable<T>
         {
             var result = new List<T>();
 

@@ -5,8 +5,6 @@ namespace ResX.Git.Merge.Driver.Tests
 {
     public class ThreeWayMergeTests
     {
-        private readonly ThreeWayMerge _merge = new ThreeWayMerge();
-
         [Fact]
         public void SecondTheSameAsAncestor()
         {
@@ -101,7 +99,7 @@ namespace ResX.Git.Merge.Driver.Tests
 
         private string Merge(string ancestor, string one, string another)
         {
-            var result = _merge.Merge(ancestor.ToCharArray(), one.ToCharArray(), another.ToCharArray());
+            var result = ThreeWayMerge.Merge(ancestor.ToCharArray(), one.ToCharArray(), another.ToCharArray());
             return new string(result);
         }
     }

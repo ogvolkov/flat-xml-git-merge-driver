@@ -1,17 +1,78 @@
 ﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Xml.Linq;
 
 namespace ResX.Git.Merge.Driver
 {
     public class ResXMerge
     {
-        public IMergeResult Merge(string ancestor, string current, string other)
+        public IMergeResult Merge(string @base, string ours, string theirs)
         {
-            XDocument ancestorXml = XDocument.Parse(ancestor);
-            XDocument currentXml = XDocument.Parse(current);
-            XDocument otherXml = XDocument.Parse(other);
+            var baseXml = XDocument.Parse(@base);
+            var oursXml = XDocument.Parse(ours);
+            var theirsXml = XDocument.Parse(theirs);
 
-            return new SuccessfullyMerged(current);
+            // right now don't bother with comparison of roots
+
+            var baseEntries = GetEntries(baseXml);
+            var oursEntries = GetEntries(oursXml);
+            var theirsEntries = GetEntries(theirsXml);
+
+            var mergedEntries = ThreeWayMerge.Merge(baseEntries, oursEntries, theirsEntries);
+
+            var mergedXml = new XDocument();
+
+            foreach (Entry mergedEntry in mergedEntries)
+            {
+                mergedXml.Root.Add(mergedEntry);
+            }
+
+            string mergedText = mergedXml.ToString();
+
+            return new SuccessfullyMerged(mergedText);
+        }
+
+        private Entry[] GetEntries(XDocument document)
+        {
+            return document.Root.Elements().Select(xElement => new Entry(xElement)).ToArray();
+        }
+
+        private class Entry: IEquatable<Entry>
+        {
+            public XElement Element { get; }
+
+            private string Key => Element.Attribute("name").Value;
+
+            private string Value => Element.Element("value").Value;
+
+            public Entry(XElement element)
+            {
+                Element = element;
+            }
+
+            public bool Equals(Entry other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+
+                return Key == other.Key && Value == other.Value;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Entry) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return (Element != null ? Element.GetHashCode() : 0);
+            }
         }
     }
 }
