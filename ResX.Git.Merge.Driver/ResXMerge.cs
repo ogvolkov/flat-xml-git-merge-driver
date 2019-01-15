@@ -1,8 +1,8 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace ResX.Git.Merge.Driver
@@ -21,16 +21,18 @@ namespace ResX.Git.Merge.Driver
             var oursEntries = GetEntries(oursXml);
             var theirsEntries = GetEntries(theirsXml);
 
-            var mergedEntries = ThreeWayMerge.Merge(baseEntries, oursEntries, theirsEntries, (_, __) => throw new MergeConflictException());
+            var mergedEntries = ThreeWayMerge.Merge(baseEntries, oursEntries, theirsEntries,
+                (part1, part2) => part2.Concat(part1));
 
-            var mergedXml = new XDocument();
+            var mergedXml = new XDocument(baseXml);
+            mergedXml.Root.RemoveAll();
 
             foreach (Entry mergedEntry in mergedEntries)
             {
-                mergedXml.Root.Add(mergedEntry);
+                mergedXml.Root.Add(mergedEntry.Element);
             }
 
-            string mergedText = mergedXml.ToString();
+            var mergedText = mergedXml.Declaration + Environment.NewLine + mergedXml;
 
             return new SuccessfullyMerged(mergedText);
         }
@@ -40,7 +42,7 @@ namespace ResX.Git.Merge.Driver
             return document.Root.Elements().Select(xElement => new Entry(xElement)).ToArray();
         }
 
-        private class Entry: IEquatable<Entry>
+        private class Entry : IEquatable<Entry>
         {
             public XElement Element { get; }
 
@@ -66,7 +68,7 @@ namespace ResX.Git.Merge.Driver
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((Entry) obj);
+                return Equals((Entry)obj);
             }
 
             public override int GetHashCode()
