@@ -36,83 +36,21 @@ namespace ResX.Git.Merge.Driver
 
             void Advance()
             {
-                if (aPos.Excess == 0)
+                if (aPos.HasEqualExcessTo(xPos))
                 {
-                    if (xPos.Excess == 0)
-                    {
-                        if (yPos.Excess == 0)
-                        {
-                            // all set
-                        }
-                        else
-                        {
-                            yPos.CopyExcessTo(result);
-                        }
-                    }
-                    else
-                    {
-                        if (yPos.Excess == 0)
-                        {
-                            xPos.CopyExcessTo(result);
-                        }
-                        else
-                        {
-                            if (xPos.HasEqualExcessTo(yPos))
-                            {
-                                xPos.CopyExcessTo(result);
-                            }
-                            else
-                            {
-                                throw new MergeConflictException();
-                            }
-                        }
-                    }
+                    yPos.CopyExcessTo(result);
+                }
+                else if (aPos.HasEqualExcessTo(yPos))
+                {
+                    xPos.CopyExcessTo(result);
+                }
+                else if (xPos.HasEqualExcessTo(yPos))
+                {
+                    xPos.CopyExcessTo(result);
                 }
                 else
                 {
-                    if (xPos.Excess == 0)
-                    {
-                        if (yPos.Excess == 0)
-                        {
-                            // all set
-                        }
-                        else
-                        {
-                            if (!aPos.HasEqualExcessTo(yPos))
-                            {
-                                throw new MergeConflictException();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (yPos.Excess == 0)
-                        {
-                            if (!aPos.HasEqualExcessTo(xPos))
-                            {
-                                throw new MergeConflictException();
-                            }
-                        }
-                        else
-                        {
-                            if (xPos.HasEqualExcessTo(yPos))
-                            {
-                                xPos.CopyExcessTo(result);
-                            }
-                            else if (aPos.HasEqualExcessTo(xPos))
-                            {
-                                yPos.CopyExcessTo(result);
-                            }
-                            else if (aPos.HasEqualExcessTo(yPos))
-                            {
-                                xPos.CopyExcessTo(result);
-                            }
-                            else
-                            {
-                                throw new MergeConflictException();
-                            }
-                        }
-                    }
+                    throw new MergeConflictException();
                 }
             }
 
@@ -127,7 +65,7 @@ namespace ResX.Git.Merge.Driver
 
             private int _currentPosition;
 
-            public int Excess => _currentPosition - _lastPosition - 1;
+            private int ExcessSize => _currentPosition - _lastPosition - 1;
 
             public ArrayWithPosition(T[] a)
             {
@@ -163,7 +101,7 @@ namespace ResX.Git.Merge.Driver
 
             public bool HasEqualExcessTo(ArrayWithPosition<T> another)
             {
-                if (Excess != another.Excess)
+                if (ExcessSize != another.ExcessSize)
                 {
                     return false;
                 }
