@@ -23,6 +23,13 @@ namespace ResX.Git.Merge.Driver.Tests
             Assert.Equal("abc", mergeResult);
         }
 
+        [Fact]
+        public void SameInserts()
+        {
+            string mergeResult = Merge("ab", "abc", "abc");
+
+            Assert.Equal("abc", mergeResult);
+        }
 
         [Fact]
         public void NonOverlappingInserts()
@@ -67,9 +74,9 @@ namespace ResX.Git.Merge.Driver.Tests
         [Fact]
         public void MultipleOperations()
         {
-            string mergeResult = Merge("Mary had a little lamb", "Susy had a little lamb.", "Mary once had a pig.");
+            string mergeResult = Merge("abcdefghi", "acWefghiX", "abcWefghiX");
 
-            Assert.Equal("Susy once had a pig.", mergeResult);
+            Assert.Equal("acWefghiX", mergeResult);
         }
 
         [Fact]

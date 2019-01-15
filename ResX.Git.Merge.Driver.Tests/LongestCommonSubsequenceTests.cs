@@ -16,6 +16,8 @@ namespace ResX.Git.Merge.Driver.Tests
                 { 0, 0 },
                 { 0, 1 }
             });
+
+            Assert.Equal("a", lcm.Result);
         }
 
         [Fact]
@@ -28,6 +30,8 @@ namespace ResX.Git.Merge.Driver.Tests
                 { 0, 0 },
                 { 0, 0 }
             });
+
+            Assert.Equal("", lcm.Result);
         }
 
         [Fact]
@@ -40,6 +44,8 @@ namespace ResX.Git.Merge.Driver.Tests
                 { 0, 0, 0 },
                 { 0, 1, 1 }
             });
+
+            Assert.Equal("a", lcm.Result);
         }
 
         [Fact]
@@ -53,6 +59,8 @@ namespace ResX.Git.Merge.Driver.Tests
                 { 0, 1 },
                 { 0, 1 }
             });
+
+            Assert.Equal("a", lcm.Result);
         }
 
         [Fact]
@@ -66,6 +74,8 @@ namespace ResX.Git.Merge.Driver.Tests
                 { 0, 1, 1 },
                 { 0, 1, 2 }
             });
+
+            Assert.Equal("ab", lcm.Result);
         }
 
         [Fact]
@@ -82,6 +92,8 @@ namespace ResX.Git.Merge.Driver.Tests
                 { 0, 1, 2, 2, 2, 2 },
                 { 0, 1, 2, 2, 3, 3 }
             });
+
+            Assert.Equal("ABC", lcm.Result);
         }
 
         private LongestCommonSubsequence<char> Lcm(string first, string second)
