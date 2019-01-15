@@ -1,4 +1,7 @@
 ﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace ResX.Git.Merge.Driver.Tests
@@ -97,9 +100,43 @@ namespace ResX.Git.Merge.Driver.Tests
             Assert.Throws<MergeConflictException>(() => Merge("abcd", "Xbcd", "Ybcd"));
         }
 
+        [Fact]
+        public void CallsMergeResolutionStrategy()
+        {
+            string mergePart1 = null;
+            string mergePart2 = null;
+
+            Merge("abcd", "abXd", "abYd",
+                (p1, p2) =>
+                {
+                    mergePart1 = new string(p1.ToArray());
+                    mergePart2 = new string(p2.ToArray());
+                    return "";
+                });
+
+            Assert.Equal("X", mergePart1);
+            Assert.Equal("Y", mergePart2);
+        }
+
+        [Fact]
+        public void UsesConflictResolutionStrategyResult()
+        {
+            string mergeResult = Merge("abcd", "abXd", "abYd",
+                (_, __) => "OMG");
+
+            Assert.Equal("abOMGd", mergeResult);
+        }
+
         private string Merge(string ancestor, string one, string another)
         {
-            var result = ThreeWayMerge.Merge(ancestor.ToCharArray(), one.ToCharArray(), another.ToCharArray());
+            return Merge(ancestor, one, another, (_, __) => throw new MergeConflictException());
+        }
+
+        private string Merge(string ancestor, string one, string another,
+                Func<IEnumerable<char>, IEnumerable<char>, IEnumerable<char>> conflictResolutionStrategy)
+        {
+            var result = ThreeWayMerge.Merge(ancestor.ToCharArray(), one.ToCharArray(), another.ToCharArray(),
+                conflictResolutionStrategy);
             return new string(result);
         }
     }

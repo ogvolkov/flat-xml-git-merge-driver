@@ -7,8 +7,12 @@ namespace ResX.Git.Merge.Driver
 {
     public static class ThreeWayMerge
     {
-        public static T[] Merge<T>(T[] @base, T[] ours, T[] theirs)
-            where T : IEquatable<T>
+        public static T[] Merge<T>(
+            T[] @base,
+            T[] ours,
+            T[] theirs,
+            Func<IEnumerable<T>, IEnumerable<T>, IEnumerable<T>> conflictResolutionStrategy
+        ) where T : IEquatable<T>
         {
             var result = new List<T>();
 
@@ -52,7 +56,8 @@ namespace ResX.Git.Merge.Driver
                 }
                 else
                 {
-                    throw new MergeConflictException();
+                    var resolvedConflicts = conflictResolutionStrategy(oursPosition.Excess, theirsPosition.Excess);
+                    result.AddRange(resolvedConflicts);
                 }
             }
 

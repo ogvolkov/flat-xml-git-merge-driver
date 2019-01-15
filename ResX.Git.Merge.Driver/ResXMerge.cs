@@ -21,7 +21,7 @@ namespace ResX.Git.Merge.Driver
             var oursEntries = GetEntries(oursXml);
             var theirsEntries = GetEntries(theirsXml);
 
-            var mergedEntries = ThreeWayMerge.Merge(baseEntries, oursEntries, theirsEntries);
+            var mergedEntries = ThreeWayMerge.Merge(baseEntries, oursEntries, theirsEntries, (_, __) => throw new MergeConflictException());
 
             var mergedXml = new XDocument();
 
