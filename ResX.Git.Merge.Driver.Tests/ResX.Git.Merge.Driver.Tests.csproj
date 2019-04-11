@@ -12,11 +12,13 @@
     <None Remove="TestCases\AdditionsAtTheEnd\current.xml" />
     <None Remove="TestCases\AdditionsAtTheEnd\other.xml" />
     <None Remove="TestCases\AdditionsAtTheEnd\result.xml" />
+    <None Remove="TestCases\ResXHeader\result.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="TestCases\ResXHeader\base.xml" />
     <EmbeddedResource Include="TestCases\ResXHeader\current.xml" />
+    <EmbeddedResource Include="TestCases\ResXHeader\result.xml" />
     <EmbeddedResource Include="TestCases\ResXHeader\other.xml" />
     <EmbeddedResource Include="TestCases\AdditionsAtTheEnd\result.xml" />
     <EmbeddedResource Include="TestCases\AdditionsAtTheEnd\other.xml" />

@@ -1,8 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace ResX.Git.Merge.Driver
@@ -17,15 +16,23 @@ namespace ResX.Git.Merge.Driver
 
             // right now don't bother with comparison of roots
 
-            var baseEntries = GetEntries(baseXml);
-            var oursEntries = GetEntries(oursXml);
-            var theirsEntries = GetEntries(theirsXml);
+            var baseEntries = GetDataEntries(baseXml);
+            var oursEntries = GetDataEntries(oursXml);
+            var theirsEntries = GetDataEntries(theirsXml);
 
             var mergedEntries = ThreeWayMerge.Merge(baseEntries, oursEntries, theirsEntries,
                 (part1, part2) => part2.Concat(part1));
 
+            // TODO validate it's only at the start and the same for all three files
+            var headerNodes = GetNonDataNodes(baseXml);
+
             var mergedXml = new XDocument(baseXml);
             mergedXml.Root.RemoveAll();
+
+            foreach (XNode headerNode in headerNodes)
+            {
+                mergedXml.Root.Add(headerNode);
+            }
 
             foreach (Entry mergedEntry in mergedEntries)
             {
@@ -37,11 +44,17 @@ namespace ResX.Git.Merge.Driver
             return new SuccessfullyMerged(mergedText);
         }
 
-        private Entry[] GetEntries(XDocument document)
+        private Entry[] GetDataEntries(XDocument document)
         {
             return document.Root.Elements()
                 .Where(xElement => xElement.Name == "data")
                 .Select(xElement => new Entry(xElement)).ToArray();
+        }
+
+        private IEnumerable<XNode> GetNonDataNodes(XDocument document)
+        {
+            return document.Root.Nodes()
+                .Where(node => !(node is XElement element && element.Name == "data"));
         }
 
         private class Entry : IEquatable<Entry>
