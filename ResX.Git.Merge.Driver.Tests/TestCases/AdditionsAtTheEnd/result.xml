@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="_Base" xml:space="preserve">
+    <value>Base value</value>
+  </data>
+  <data name="_Other" xml:space="preserve">
+    <value>Other value</value>
+  </data>
+  <data name="_Current" xml:space="preserve">
+    <value>Current value</value>
+  </data>
+</root>

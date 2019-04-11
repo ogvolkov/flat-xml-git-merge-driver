@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using System.IO;
+using System.Reflection;
+using Xunit;
 
 namespace ResX.Git.Merge.Driver.Tests
 {
@@ -10,35 +12,11 @@ namespace ResX.Git.Merge.Driver.Tests
         public void CombinesKeyAdditionsAtTheEndOfTheFile()
         {
             // arrange
-            string ancestor =
-@"<?xml version=""1.0"" encoding=""utf-8""?>
-<root>
-  <data name=""_Base"" xml:space=""preserve"">
-    <value>Base value</value>
-  </data>
-</root>";
+            string ancestor = GetEmbeddedResourceContent("TestCases.AdditionsAtTheEnd.base.xml");
 
-            string current =
-@"<?xml version=""1.0"" encoding=""utf-8""?>
-<root>
-  <data name=""_Base"" xml:space=""preserve"">
-    <value>Base value</value>
-  </data>
-  <data name=""_Current"" xml:space=""preserve"">
-    <value>Current value</value>
-  </data>
-</root>";
+            string current = GetEmbeddedResourceContent("TestCases.AdditionsAtTheEnd.current.xml");
 
-            string other =
-@"<?xml version=""1.0"" encoding=""utf-8""?>
-<root>
-  <data name=""_Base"" xml:space=""preserve"">
-    <value>Base value</value>
-  </data>
-  <data name=""_Other"" xml:space=""preserve"">
-    <value>Other value</value>
-  </data>
-</root>";
+            string other = GetEmbeddedResourceContent("TestCases.AdditionsAtTheEnd.other.xml");
 
             // act
             IMergeResult result = _merge.Merge(ancestor, current, other);
@@ -46,21 +24,23 @@ namespace ResX.Git.Merge.Driver.Tests
             // assert
             Assert.IsType<SuccessfullyMerged>(result);
 
-            string expectedMerge =
-@"<?xml version=""1.0"" encoding=""utf-8""?>
-<root>
-  <data name=""_Base"" xml:space=""preserve"">
-    <value>Base value</value>
-  </data>
-  <data name=""_Other"" xml:space=""preserve"">
-    <value>Other value</value>
-  </data>
-  <data name=""_Current"" xml:space=""preserve"">
-    <value>Current value</value>
-  </data>
-</root>";
+            string expectedMerge = GetEmbeddedResourceContent("TestCases.AdditionsAtTheEnd.result.xml");
 
             Assert.Equal(expectedMerge, ((SuccessfullyMerged)result).MergeResult);
+        }
+
+        private string GetEmbeddedResourceContent(string fileName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"{GetType().Namespace}.{fileName}";
+
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
         }
     }
 }
