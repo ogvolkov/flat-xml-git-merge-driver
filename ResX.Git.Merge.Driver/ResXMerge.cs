@@ -39,7 +39,9 @@ namespace ResX.Git.Merge.Driver
 
         private Entry[] GetEntries(XDocument document)
         {
-            return document.Root.Elements().Select(xElement => new Entry(xElement)).ToArray();
+            return document.Root.Elements()
+                .Where(xElement => xElement.Name == "data")
+                .Select(xElement => new Entry(xElement)).ToArray();
         }
 
         private class Entry : IEquatable<Entry>

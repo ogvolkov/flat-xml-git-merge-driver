@@ -5,6 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestCases\ResXHeader\base.xml" />
+    <None Remove="TestCases\ResXHeader\current.xml" />
+    <None Remove="TestCases\ResXHeader\other.xml" />
     <None Remove="TestCases\AdditionsAtTheEnd\base.xml" />
     <None Remove="TestCases\AdditionsAtTheEnd\current.xml" />
     <None Remove="TestCases\AdditionsAtTheEnd\other.xml" />
@@ -12,6 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="TestCases\ResXHeader\base.xml" />
+    <EmbeddedResource Include="TestCases\ResXHeader\current.xml" />
+    <EmbeddedResource Include="TestCases\ResXHeader\other.xml" />
     <EmbeddedResource Include="TestCases\AdditionsAtTheEnd\result.xml" />
     <EmbeddedResource Include="TestCases\AdditionsAtTheEnd\other.xml" />
     <EmbeddedResource Include="TestCases\AdditionsAtTheEnd\current.xml" />

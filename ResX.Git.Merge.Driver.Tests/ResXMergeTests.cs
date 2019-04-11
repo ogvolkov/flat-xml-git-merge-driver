@@ -29,6 +29,23 @@ namespace ResX.Git.Merge.Driver.Tests
             Assert.Equal(expectedMerge, ((SuccessfullyMerged)result).MergeResult);
         }
 
+        [Fact]
+        public void IsNotConfusedByResXHeader()
+        {
+            // arrange
+            string ancestor = GetEmbeddedResourceContent("TestCases.ResXHeader.base.xml");
+
+            string current = GetEmbeddedResourceContent("TestCases.ResXHeader.current.xml");
+
+            string other = GetEmbeddedResourceContent("TestCases.ResXHeader.other.xml");
+
+            // act
+            IMergeResult result = _merge.Merge(ancestor, current, other);
+
+            // assert
+            Assert.IsType<SuccessfullyMerged>(result);
+        }
+
         private string GetEmbeddedResourceContent(string fileName)
         {
             var assembly = Assembly.GetExecutingAssembly();
